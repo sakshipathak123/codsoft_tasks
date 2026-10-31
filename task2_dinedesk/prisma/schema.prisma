@@ -1,0 +1,58 @@
+generator client { provider = "prisma-client-js" }
+datasource db { provider = "postgresql"
+  url = env("DATABASE_URL") }
+
+enum Role { CUSTOMER KITCHEN ADMIN }
+enum OrderStatus { PLACED PREPARING READY COMPLETED }
+
+model User {
+  id           Int           @id @default(autoincrement())
+  name         String
+  email        String        @unique
+  password     String
+  role         Role          @default(CUSTOMER)
+  orders       Order[]
+  reservations Reservation[]
+}
+model MenuItem {
+  id          Int         @id @default(autoincrement())
+  name        String
+  description String      @default("")
+  category    String
+  price       Int
+  available   Boolean     @default(true)
+  orderItems  OrderItem[]
+}
+model Order {
+  id        Int         @id @default(autoincrement())
+  userId    Int
+  status    OrderStatus @default(PLACED)
+  paid      Boolean     @default(false)
+  createdAt DateTime    @default(now())
+  user      User        @relation(fields: [userId], references: [id])
+  items     OrderItem[]
+}
+model OrderItem {
+  id         Int      @id @default(autoincrement())
+  orderId    Int
+  menuItemId Int
+  qty        Int
+  price      Int
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
+}
+model DiningTable {
+  id           Int           @id @default(autoincrement())
+  number       Int           @unique
+  seats        Int
+  reservations Reservation[]
+}
+model Reservation {
+  id       Int         @id @default(autoincrement())
+  userId   Int
+  tableId  Int
+  guests   Int
+  time     DateTime
+  user     User        @relation(fields: [userId], references: [id])
+  table    DiningTable @relation(fields: [tableId], references: [id])
+}
