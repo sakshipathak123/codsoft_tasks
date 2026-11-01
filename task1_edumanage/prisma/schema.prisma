@@ -1,8 +1,16 @@
-generator client { provider = "prisma-client-js" }
-datasource db { provider = "postgresql"
-  url = env("DATABASE_URL") }
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
 
-enum Role { ADMIN TEACHER STUDENT }
+enum Role {
+  ADMIN
+  TEACHER
+  STUDENT
+}
 
 model User {
   id       Int      @id @default(autoincrement())
